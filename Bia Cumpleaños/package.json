@@ -1,0 +1,16 @@
+{
+  "name": "birthday-render-service",
+  "version": "1.0.0",
+  "description": "Servicio que convierte templates HTML de cumpleaños a PNG — reemplaza BannerBear",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
