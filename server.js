@@ -55,7 +55,6 @@ const TEMPLATES = {
 <head>
   <meta charset="UTF-8">
   <title>Cumpleaños</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #0d0d1a; }
@@ -80,7 +79,6 @@ const TEMPLATES = {
 <head>
   <meta charset="UTF-8">
   <title>Cumpleaños</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #0d0d1a; }
@@ -140,7 +138,7 @@ app.post('/render', async (req, res) => {
     const b = await getBrowser();
     page = await b.newPage();
     await page.setViewport({ width: 420, height: 560, deviceScaleFactor: 2 });
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.evaluate(() =>
       Promise.all(Array.from(document.images).map(img =>
         img.complete ? Promise.resolve() :
