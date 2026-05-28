@@ -19,8 +19,7 @@ RUN npm ci --only=production
 
 # Copia el servidor y las imágenes de fondo
 COPY server.js ./
-COPY bg_confetti.png ./
-COPY bg_purpura.png ./
+COPY img/ ./img/
 
 EXPOSE 3000
 CMD ["node", "server.js"]
