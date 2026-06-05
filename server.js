@@ -5,7 +5,6 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-// ─── Descarga una imagen remota y la convierte a base64 ──────────────────────
 function fetchImageAsBase64(url) {
   return new Promise((resolve) => {
     try {
@@ -32,7 +31,6 @@ function fetchImageAsBase64(url) {
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 
-// ─── Carga fondos como base64 al arrancar ─────────────────────────────────────
 function loadBg(filename) {
   try {
     const buf = fs.readFileSync(path.join(__dirname, 'img', filename));
@@ -48,9 +46,8 @@ const BG = {
   purpura:  loadBg('bg_purpura.png'),
 };
 
-// ─── Templates HTML ───────────────────────────────────────────────────────────
 const TEMPLATES = {
-  confetti: (bgSrc, fotoUrl, nombre) => `<!DOCTYPE html>
+  confetti: (bgSrc, fotoUrl, nombre, fontSize) => `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -62,7 +59,7 @@ const TEMPLATES = {
     .card .bg-image { width: 100%; display: block; }
     .photo-slot { position: absolute; top: 20%; left: 51%; transform: translateX(-50%); width: 42%; aspect-ratio: 1 / 1; border-radius: 50%; overflow: hidden; }
     .photo-slot img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .name-slot { position: absolute; bottom: 85px; left: 53%; transform: translateX(-50%); width: 40%; text-align: center; color: #dcdcdc; font-family: 'Montserrat', sans-serif; font-size: clamp(11px, 3.8vw, 16px); font-weight: 800; letter-spacing: 0.04em; line-height: 1.3; white-space: normal; word-break: break-word; }
+    .name-slot { position: absolute; bottom: 85px; left: 53%; transform: translateX(-50%); width: 40%; text-align: center; color: #dcdcdc; font-family: Arial, sans-serif; font-size: ${fontSize}; font-weight: 800; letter-spacing: 0.04em; line-height: 1.3; white-space: normal; word-break: break-word; }
   </style>
 </head>
 <body>
@@ -74,7 +71,7 @@ const TEMPLATES = {
 </body>
 </html>`,
 
-  purpura: (bgSrc, fotoUrl, nombre) => `<!DOCTYPE html>
+  purpura: (bgSrc, fotoUrl, nombre, fontSize) => `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -86,7 +83,7 @@ const TEMPLATES = {
     .card .bg-image { width: 100%; display: block; }
     .photo-slot { position: absolute; top: 20%; left: 51%; transform: translateX(-50%); width: 179px; aspect-ratio: 1 / 1; border-radius: 53%; overflow: hidden; }
     .photo-slot img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    .name-slot { position: absolute; bottom: 85px; left: 53%; transform: translateX(-50%); width: 40%; text-align: center; color: #dcdcdc; font-family: 'Montserrat', sans-serif; font-size: clamp(11px, 3.8vw, 16px); font-weight: 800; letter-spacing: 0.04em; line-height: 1.3; white-space: normal; word-break: break-word; }
+    .name-slot { position: absolute; bottom: 85px; left: 53%; transform: translateX(-50%); width: 40%; text-align: center; color: #dcdcdc; font-family: Arial, sans-serif; font-size: ${fontSize}; font-weight: 800; letter-spacing: 0.04em; line-height: 1.3; white-space: normal; word-break: break-word; }
   </style>
 </head>
 <body>
@@ -99,7 +96,6 @@ const TEMPLATES = {
 </html>`,
 };
 
-// ─── Browser reutilizable ─────────────────────────────────────────────────────
 let browser = null;
 
 async function getBrowser() {
@@ -113,7 +109,6 @@ async function getBrowser() {
   return browser;
 }
 
-// ─── POST /render ─────────────────────────────────────────────────────────────
 app.post('/render', async (req, res) => {
   const { nombre, foto_url, template = 'confetti' } = req.body;
 
@@ -128,10 +123,9 @@ app.post('/render', async (req, res) => {
 
   const nombreSafe = nombre.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const buildFn = TEMPLATES[template] || TEMPLATES.confetti;
-
-  // Descarga la foto como base64 para evitar bloqueos CORS/auth
   const fotoBase64 = foto_url ? await fetchImageAsBase64(foto_url) : '';
-  const html = buildFn(bgSrc, fotoBase64, nombreSafe);
+  const fontSize = nombreSafe.length > 18 ? '10px' : nombreSafe.length > 12 ? '13px' : '16px';
+  const html = buildFn(bgSrc, fotoBase64, nombreSafe, fontSize);
 
   let page;
   try {
@@ -158,7 +152,6 @@ app.post('/render', async (req, res) => {
   }
 });
 
-// ─── GET /health ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) =>
   res.json({ ok: true, templates: Object.keys(TEMPLATES), fondos: Object.fromEntries(Object.entries(BG).map(([k,v]) => [k, !!v])) })
 );
