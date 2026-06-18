@@ -49,7 +49,7 @@ const TEMPLATES = {
 <html lang="es"><head><meta charset="UTF-8"><style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0d0d1a; }
-  .card { position:relative; width:420px; display:inline-block; }
+  .card { position:relative; width:420px; display:inline-block; overflow:hidden; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:42%; aspect-ratio:1/1; border-radius:50%; overflow:hidden; }
   .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
@@ -66,7 +66,7 @@ const TEMPLATES = {
 <html lang="es"><head><meta charset="UTF-8"><style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0d0d1a; }
-  .card { position:relative; width:420px; display:inline-block; }
+  .card { position:relative; width:420px; display:inline-block; overflow:hidden; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:179px; aspect-ratio:1/1; border-radius:53%; overflow:hidden; }
   .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
