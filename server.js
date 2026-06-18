@@ -52,8 +52,8 @@ const TEMPLATES = {
   .card { position:relative; width:420px; display:inline-block; overflow:hidden; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:42%; aspect-ratio:1/1; border-radius:50%; overflow:hidden; }
-  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
-  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
+  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+  .name-slot { position:absolute; bottom:85px; left:50%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
     <img class="bg-image" src="${bgSrc}">
@@ -69,8 +69,8 @@ const TEMPLATES = {
   .card { position:relative; width:420px; display:inline-block; overflow:hidden; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:179px; aspect-ratio:1/1; border-radius:53%; overflow:hidden; }
-  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
-  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
+  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+  .name-slot { position:absolute; bottom:85px; left:50%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
     <img class="bg-image" src="${bgSrc}">
@@ -86,12 +86,12 @@ function buildCombinedHtml(cards) {
     const photoW = isConfetti ? '42%' : '179px';
     const photoR = isConfetti ? '50%' : '53%';
     return `
-    <div style="position:relative;width:420px;flex-shrink:0;">
+    <div style="position:relative;width:420px;flex-shrink:0;overflow:hidden;">
       <img style="width:100%;display:block;" src="${bgSrc}">
       <div style="position:absolute;top:20%;left:51%;transform:translateX(-50%);width:${photoW};aspect-ratio:1/1;border-radius:${photoR};overflow:hidden;">
-        <img style="width:100%;height:100%;object-fit:cover;object-position:center center;" src="${fotoBase64}">
+        <img style="width:100%;height:100%;object-fit:cover;object-position:center top;" src="${fotoBase64}">
       </div>
-      <div style="position:absolute;bottom:85px;left:53%;transform:translateX(-50%);width:55%;text-align:center;color:#dcdcdc;font-family:Arial,sans-serif;font-size:clamp(11px,3.8vw,16px);font-weight:800;letter-spacing:0.04em;line-height:1.3;white-space:normal;word-break:break-word;">${nombre}</div>
+      <div style="position:absolute;bottom:85px;left:50%;transform:translateX(-50%);width:55%;text-align:center;color:#dcdcdc;font-family:Arial,sans-serif;font-size:clamp(11px,3.8vw,16px);font-weight:800;letter-spacing:0.04em;line-height:1.3;white-space:normal;word-break:break-word;">${nombre}</div>
     </div>`;
   }).join('');
 
@@ -166,8 +166,10 @@ app.post('/render-batch', async (req, res) => {
     await page.evaluate(() => Promise.all(Array.from(document.images).map(img =>
       img.complete ? Promise.resolve() : new Promise(r => { img.onload = img.onerror = r; })
     )));
-    const body = await page.$('body');
-    const screenshot = await body.screenshot({ type: 'png' });
+    const screenshot = await page.screenshot({
+      type: 'png',
+      clip: { x: 0, y: 0, width: totalWidth, height: 560 }
+    });
     res.set('Content-Type', 'image/png');
     res.set('Content-Disposition', 'attachment; filename="cumpleanos.png"');
     res.send(screenshot);
