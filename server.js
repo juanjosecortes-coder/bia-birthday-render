@@ -44,7 +44,6 @@ const BG = {
   purpura:  loadBg('bg_purpura.png'),
 };
 
-// ─── Template individual ──────────────────────────────────────────────────────
 const TEMPLATES = {
   confetti: (bgSrc, fotoUrl, nombre) => `<!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><style>
@@ -54,7 +53,7 @@ const TEMPLATES = {
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:42%; aspect-ratio:1/1; border-radius:50%; overflow:hidden; }
   .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
-  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:40%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
+  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
     <img class="bg-image" src="${bgSrc}">
@@ -71,7 +70,7 @@ const TEMPLATES = {
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:179px; aspect-ratio:1/1; border-radius:53%; overflow:hidden; }
   .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
-  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:40%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
+  .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
     <img class="bg-image" src="${bgSrc}">
@@ -81,7 +80,6 @@ const TEMPLATES = {
 </body></html>`,
 };
 
-// ─── HTML combinado (varias tarjetas lado a lado) ─────────────────────────────
 function buildCombinedHtml(cards) {
   const cardDivs = cards.map(({ bgSrc, fotoBase64, nombre, template }) => {
     const isConfetti = template !== 'purpura';
@@ -93,7 +91,7 @@ function buildCombinedHtml(cards) {
       <div style="position:absolute;top:20%;left:51%;transform:translateX(-50%);width:${photoW};aspect-ratio:1/1;border-radius:${photoR};overflow:hidden;">
         <img style="width:100%;height:100%;object-fit:cover;object-position:center top;" src="${fotoBase64}">
       </div>
-      <div style="position:absolute;bottom:85px;left:53%;transform:translateX(-50%);width:40%;text-align:center;color:#dcdcdc;font-family:Arial,sans-serif;font-size:clamp(11px,3.8vw,16px);font-weight:800;letter-spacing:0.04em;line-height:1.3;white-space:normal;word-break:break-word;">${nombre}</div>
+      <div style="position:absolute;bottom:85px;left:53%;transform:translateX(-50%);width:55%;text-align:center;color:#dcdcdc;font-family:Arial,sans-serif;font-size:clamp(11px,3.8vw,16px);font-weight:800;letter-spacing:0.04em;line-height:1.3;white-space:normal;word-break:break-word;">${nombre}</div>
     </div>`;
   }).join('');
 
@@ -118,17 +116,14 @@ async function getBrowser() {
   return browser;
 }
 
-// ─── POST /render (una persona) ───────────────────────────────────────────────
 app.post('/render', async (req, res) => {
   const { nombre, foto_url, template = 'confetti' } = req.body;
   if (!nombre || !foto_url) return res.status(400).json({ error: 'Se requieren nombre y foto_url' });
-
   const bgSrc = BG[template] || BG.confetti;
   const nombreSafe = nombre.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const buildFn = TEMPLATES[template] || TEMPLATES.confetti;
   const fotoBase64 = await fetchImageAsBase64(foto_url);
   const html = buildFn(bgSrc, fotoBase64, nombreSafe);
-
   let page;
   try {
     const b = await getBrowser();
@@ -150,11 +145,9 @@ app.post('/render', async (req, res) => {
   }
 });
 
-// ─── POST /render-batch (varias personas, una imagen combinada) ───────────────
 app.post('/render-batch', async (req, res) => {
   const { people } = req.body;
   if (!people?.length) return res.status(400).json({ error: 'Se requiere array people' });
-
   const cards = await Promise.all(people.map(async (p) => {
     const template = p.template || 'confetti';
     const bgSrc = BG[template] || BG.confetti;
@@ -162,15 +155,13 @@ app.post('/render-batch', async (req, res) => {
     const nombre = (p.nombre || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return { bgSrc, fotoBase64, nombre, template };
   }));
-
   const totalWidth = people.length * 420 + (people.length - 1) * 8;
   const html = buildCombinedHtml(cards);
-
   let page;
   try {
     const b = await getBrowser();
     page = await b.newPage();
-    await page.setViewport({ width: totalWidth, height: 560, deviceScaleFactor: 2 });
+    await page.setViewport({ width: totalWidth + 20, height: 560, deviceScaleFactor: 2 });
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.evaluate(() => Promise.all(Array.from(document.images).map(img =>
       img.complete ? Promise.resolve() : new Promise(r => { img.onload = img.onerror = r; })
@@ -187,7 +178,6 @@ app.post('/render-batch', async (req, res) => {
   }
 });
 
-// ─── GET /health ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) =>
   res.json({ ok: true, templates: Object.keys(TEMPLATES), fondos: Object.fromEntries(Object.entries(BG).map(([k,v]) => [k, !!v])) })
 );
