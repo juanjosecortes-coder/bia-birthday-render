@@ -52,7 +52,7 @@ const TEMPLATES = {
   .card { position:relative; width:420px; display:inline-block; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:42%; aspect-ratio:1/1; border-radius:50%; overflow:hidden; }
-  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
   .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
@@ -69,7 +69,7 @@ const TEMPLATES = {
   .card { position:relative; width:420px; display:inline-block; }
   .card .bg-image { width:100%; display:block; }
   .photo-slot { position:absolute; top:20%; left:51%; transform:translateX(-50%); width:179px; aspect-ratio:1/1; border-radius:53%; overflow:hidden; }
-  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+  .photo-slot img { width:100%; height:100%; object-fit:cover; object-position:center center; }
   .name-slot { position:absolute; bottom:85px; left:53%; transform:translateX(-50%); width:55%; text-align:center; color:#dcdcdc; font-family:Arial,sans-serif; font-size:clamp(11px,3.8vw,16px); font-weight:800; letter-spacing:0.04em; line-height:1.3; white-space:normal; word-break:break-word; }
 </style></head><body>
   <div class="card">
@@ -89,7 +89,7 @@ function buildCombinedHtml(cards) {
     <div style="position:relative;width:420px;flex-shrink:0;">
       <img style="width:100%;display:block;" src="${bgSrc}">
       <div style="position:absolute;top:20%;left:51%;transform:translateX(-50%);width:${photoW};aspect-ratio:1/1;border-radius:${photoR};overflow:hidden;">
-        <img style="width:100%;height:100%;object-fit:cover;object-position:center top;" src="${fotoBase64}">
+        <img style="width:100%;height:100%;object-fit:cover;object-position:center center;" src="${fotoBase64}">
       </div>
       <div style="position:absolute;bottom:85px;left:53%;transform:translateX(-50%);width:55%;text-align:center;color:#dcdcdc;font-family:Arial,sans-serif;font-size:clamp(11px,3.8vw,16px);font-weight:800;letter-spacing:0.04em;line-height:1.3;white-space:normal;word-break:break-word;">${nombre}</div>
     </div>`;
