@@ -98,7 +98,7 @@ function buildCombinedHtml(cards) {
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { display:flex; flex-direction:row; gap:8px; background:#0d0d1a; padding:0; }
+  body { display:flex; flex-direction:row; gap:8px; background:#0d0d1a; padding:0; margin:0; }
 </style></head>
 <body>${cardDivs}</body></html>`;
 }
@@ -128,7 +128,7 @@ app.post('/render', async (req, res) => {
   try {
     const b = await getBrowser();
     page = await b.newPage();
-    await page.setViewport({ width: 420, height: 560, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 420, height: 800, deviceScaleFactor: 2 });
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.evaluate(() => Promise.all(Array.from(document.images).map(img =>
       img.complete ? Promise.resolve() : new Promise(r => { img.onload = img.onerror = r; })
@@ -161,14 +161,20 @@ app.post('/render-batch', async (req, res) => {
   try {
     const b = await getBrowser();
     page = await b.newPage();
-    await page.setViewport({ width: totalWidth + 20, height: 560, deviceScaleFactor: 2 });
+    await page.setViewport({ width: totalWidth + 20, height: 800, deviceScaleFactor: 2 });
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.evaluate(() => Promise.all(Array.from(document.images).map(img =>
       img.complete ? Promise.resolve() : new Promise(r => { img.onload = img.onerror = r; })
     )));
+    const bodyHeight = await page.evaluate(() => {
+      const imgs = document.querySelectorAll('div[style*="position:relative"]');
+      let maxH = 0;
+      imgs.forEach(el => { if (el.offsetHeight > maxH) maxH = el.offsetHeight; });
+      return maxH || document.body.scrollHeight;
+    });
     const screenshot = await page.screenshot({
       type: 'png',
-      clip: { x: 0, y: 0, width: totalWidth, height: 560 }
+      clip: { x: 0, y: 0, width: totalWidth, height: bodyHeight }
     });
     res.set('Content-Type', 'image/png');
     res.set('Content-Disposition', 'attachment; filename="cumpleanos.png"');
